@@ -13,6 +13,7 @@ export interface ActiveVisit {
   visitStartTime: string;
   visitType: string;
   visitUuid: string;
+  visit: Visit;
 }
 
 export function useActiveVisits() {
@@ -21,9 +22,16 @@ export function useActiveVisits() {
   const sessionLocation = currentUserSession?.data?.sessionLocation?.uuid;
 
   const customRepresentation =
-    'custom:(uuid,patient:(uuid,identifiers:(identifier,uuid),person:(age,display,gender,uuid)),' +
-    'visitType:(uuid,name,display),location:(uuid,name,display),startDatetime,' +
-    'stopDatetime)&fromStartDate=' +
+    'custom:(uuid,encounters:(uuid,form:(uuid,display),encounterDatetime,' +
+    'orders:full,' +
+    'obs:(uuid,concept:(uuid,display,conceptClass:(uuid,display)),' +
+    'display,groupMembers:(uuid,concept:(uuid,display),' +
+    'value:(uuid,display)),value),encounterType:(uuid,display),' +
+    'encounterProviders:(uuid,display,encounterRole:(uuid,display),' +
+    'provider:(uuid,person:(uuid,display)))),' +
+    'visitType:(uuid,name,display),startDatetime,stopDatetime,' +
+    'patient:(uuid,identifiers:(identifier,uuid),person:(age,display,gender,uuid)),' +
+    'location:(uuid,name,display)&fromStartDate=' +
     startDate +
     '&location=' +
     sessionLocation;
@@ -41,6 +49,7 @@ export function useActiveVisits() {
     visitStartTime: visit?.startDatetime,
     visitType: visit?.visitType?.display,
     visitUuid: visit.uuid,
+    visit: visit,
   });
 
   const formattedActiveVisits = data?.data?.results.length ? data.data.results.map(mapVisitProperties) : [];
